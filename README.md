@@ -1,5 +1,5 @@
 # Keywords extraction from a website page
-Link to the articles
+This module aims at implementing the k-truss graph of words method in order to extract keywords from a website page. It implements several algorithms presented in the following links: https://arxiv.org/pdf/1205.6693.pdf and https://www.aclweb.org/anthology/D16-1191.
 
 ## preprocess
 Once we get the text data from the website page, several steps are required to do a proper preprocessing of the textual data:
