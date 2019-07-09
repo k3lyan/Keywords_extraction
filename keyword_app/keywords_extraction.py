@@ -1,12 +1,15 @@
-import sys
+import os
 import networkx as nx
-from networkx import k_core, core_number, drawing, common_neighbors 
-from preprocess import preprocess
+from networkx import k_core, core_number, drawing, common_neighbors
 from collections import OrderedDict, defaultdict
 import itertools
-import matplotlib.pyplot as plt 
+#import matplotlib.pyplot as plt
 from datetime import datetime
-from optimization import density, elbow_function
+from keyword_app.services.optimization import density, elbow_function
+from keyword_app.services.preprocess import preprocess
+from keyword_app.utils.logging_config import setup_custom_logger
+
+logger = setup_custom_logger('root')
 
 def unweighted_edges(w):
     cleant_sentences = preprocess()
@@ -24,8 +27,8 @@ def unweighted_edges(w):
                 adjacency_count[text_edge] = 1
         if(w<=len_sentence):
             for i in range(w, len_sentence):
-                term_dissmissed = sents[i] 
-                window = sents[(i-w+1):(i+1)] 
+                term_dissmissed = sents[i]
+                window = sents[(i-w+1):(i+1)]
                 for p in range(w-1):
                     candidate_edge = (window[p], term_dissmissed)
                     if candidate_edge in adjacency_count:
@@ -84,7 +87,7 @@ def k_truss(G, output_for_density=True):
                     if((u,w) in sup_keys):
                         edges_sorted[(u,w)] -= 1
                     else:
-                        edges_sorted[(w,u)] -= 1 
+                        edges_sorted[(w,u)] -= 1
                     edges_sorted = sorted_dict(edges_sorted)
             del(edges_sorted[edge])
             liste_remove_k.append(edge)
@@ -100,10 +103,10 @@ def k_truss(G, output_for_density=True):
             for node_not_removed in sub_G.nodes:
                 k_truss_nodes[node_not_removed] += 1
             if(output_for_density):
-                output_density.append([k, len(list(sub_G.nodes)), len(sub_G.edges)]) 
-    nx.draw(sub_G, with_labels=True, font_color='k', node_color='g', edge_color='y', font_size=max(min(20,500/len(sub_G.nodes)),9), width=1, node_size=0, label='k-subgraph')
+                output_density.append([k, len(list(sub_G.nodes)), len(sub_G.edges)])
+    #nx.draw(sub_G, with_labels=True, font_color='k', node_color='g', edge_color='y', font_size=max(min(20,500/len(sub_G.nodes)),9), width=1, node_size=0, label='k-subgraph')
     #plt.show()
-    plt.savefig('{}-truss_subgraph.png'.format(k))
+    #plt.savefig('{}-truss_subgraph.png'.format(k))
     return (k_truss_nodes, k, sub_G, output_density)
 
 def sorted_keywords(k_truss_nodes):
@@ -111,8 +114,8 @@ def sorted_keywords(k_truss_nodes):
 
 def get_optimized_nb_keywords(output_density, density_applied):
     if(density_applied):
-        D_n = density(output_density) 
-        print('elbow_function(D_n): ', elbow_function(D_n))
+        D_n = density(output_density)
+        logger.debug(f'elbow_function(D_n): {elbow_function(D_n)}')
         return(output_density[elbow_function(D_n)][1])
     else:
         CD = []
@@ -126,22 +129,22 @@ def get_optimized_nb_keywords(output_density, density_applied):
 
 def main():
     t0 = datetime.now()
-    unweighted_edges_list = list(unweighted_edges(10).keys())     
+    unweighted_edges_list = list(unweighted_edges(10).keys())
     G_unweighted = unweighted_graph(unweighted_edges_list)
     k_truss_nodes, k, sub_G, output_density = k_truss(G_unweighted, output_for_density=True)
-    
+
     optimization_method = False
     if optimization_method:
         nb_keywords = get_optimized_nb_keywords(output_density, True)
     else:
-        nb_keywords = int(sys.argv[2])
-    
+        nb_keywords = int(os.getenv('NB_KW', 10))
+
     t1 = datetime.now() - t0
-    print('K-Truss step: {}'.format(t1))
-    print('K-max: ', k)
-    print('-----------List of keywords ({})-----------: \n'.format(nb_keywords))
+    logger.debug(f'K-Truss step: {t1}')
+    logger.debug(f'K-max: {k}')
+    logger.debug(f'-----------List of keywords ({nb_keywords})-----------')
     for i in range(nb_keywords):
-        print(sorted_keywords(k_truss_nodes)[i])
+        logger.debug(sorted_keywords(k_truss_nodes)[i])
 
 if __name__ == '__main__':
-    main() 
+    main()
