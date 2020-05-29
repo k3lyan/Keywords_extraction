@@ -6,7 +6,7 @@ import itertools
 #import matplotlib.pyplot as plt
 from datetime import datetime
 from keyword_app.services.optimization import density, elbow_function
-from keyword_app.services.preprocess import preprocess
+from keyword_app.services.preprocessor import preprocess
 from keyword_app.utils.logging_config import setup_custom_logger
 
 logger = setup_custom_logger('root')

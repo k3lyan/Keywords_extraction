@@ -22,18 +22,12 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 RUN pip install --upgrade pip && pip install -r requirements.txt
 COPY ./CHANGELOG.md ./
 COPY ./keyword_app ./keyword_app
-ENV PORT_API=54321
-ENV BIND_INTERFACE=0.0.0.0
 ENV API_VERSION=1.0.0
-
-EXPOSE 54321
 
 RUN python3 -m spacy download fr_core_news_sm
 RUN python3 -m spacy download es_core_news_sm
 RUN python3 -m spacy download en_core_web_sm
-
-RUN pip install textacy
-RUN pip install ftfy
+RUN python3 -m pip install joblib
 RUN python3 -m nltk.downloader punkt && python3 -m nltk.downloader stopwords
 
-CMD python3 -m keyword_app.keywords_extraction
+CMD python3 -m keyword_app.keywords_extractor

@@ -43,7 +43,12 @@ Install langid:
 `$pip install langid`  
 
 ## How to use ?
-By default, the number of keywords must be given but through the implementation of the optimization method, it is possible to get automatically the best number of keywords (see optimization.py). Through the default choice, you can thus launch the script this way:  
-`$python3 keywords_extraction.py url_link nb_of_keywords_wanted`  
+By default, the number of keywords, the URL and the log level must be given. You can configure an environment file at the root containing these values, such as:  
+`URL=https://my_url.com/`  
+`NB_KW=10`  
+`LOG_LEVEL=DEBUG`  
+Then build the docker image at the root directory (that we call "kw-extractor" here): `docker image build -t kw-extractor .`  
+Run your container by injecting the environment file (for example called ".kw_en""): `docker run --env-file=.kw_env kw_extractor`   
+
 Pay attention ! So far the solution is implemented only for web pages in English, French or Spanish.
 

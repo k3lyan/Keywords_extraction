@@ -1,9 +1,8 @@
 import os
 import sys
 from datetime import datetime
-import textacy
+from textacy import preprocessing
 import spacy
-import langid
 import re
 import ftfy
 import logging
@@ -23,9 +22,9 @@ def line_cleaner(paragraph):
 def webscrap(url):
     page_response = requests.get(url, timeout=5)
     page_content = BeautifulSoup(page_response.content, "html.parser")
-    nb_paragraphs = len(page_content.find_all("p"))
-    paragraphs = [str(line_cleaner(page_content.find_all("p")[i].text)).strip('  ') for i in range(nb_paragraphs)]
-    return paragraphs
+    paragraphs = page_content.find_all("p")
+    paragraphs.extend(page_content.find_all("title"))
+    return [line_cleaner(p.text).strip('  ') for p in paragraphs]
 
 def language_detect(text, identifier):
     '''
@@ -62,14 +61,14 @@ def get_language(paragraphs):
     return initials
 
 def get_sentences(initials, text, stemmer):
-    '''
+    """"
     Function to get the sentences with their words(or stems), without the stop-words.
     Inputs:
         initials: initials of the language mainly used in the text
         text content: string of the preprocessed text
         stemmer: True if the stemmer should be used
     Output: array of the sentences, each sentence being an array of the words in the original sentence
-    '''
+    """
     language_map = {'fr': 'french', 'en': 'english', 'es': 'spanish'}
     language = language_map[initials]
     nlp = models[initials]
@@ -86,9 +85,9 @@ def txt_to_sentences(paragraphs, initials):
     '''Tokenize a text file, calculate the stem and the postag and returns a list of the sentences with this 3 informations for each token.'''
     text = ' '.join(paragraphs).lower()
     try:
-        text = textacy.preprocess.normalize_whitespace(text)
+        text = preprocessing.normalize.normalize_whitespace(text)
         text = ftfy.fix_text(text)
-        text = textacy.preprocess.unpack_contractions(text)
+        #text = preprocessing.unpack_contractions(text)
         sents = get_sentences(initials, text, False)
     except ValueError as e:
         logger.debug('ERROR: {filename}')
@@ -104,7 +103,7 @@ def preprocess():
     paragraphs = webscrap(os.getenv("URL", "https://towardsdatascience.com/"))
     initials = get_language(paragraphs)
     sents = txt_to_sentences(paragraphs, initials)
-    logger.debug('Preprocessing step: {datetime.now() - t0}')
+    logger.debug(f'Preprocessing step: {datetime.now() - t0}')
     return sents
 
 if __name__ == '__main__':
