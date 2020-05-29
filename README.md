@@ -22,33 +22,13 @@ Once we get the text data from the website page, several steps are required to d
 * Build the K-truss subgraphs
 * Optimize by density and elbow method to get the optimal number of keywords
 
-## Libraries needed
-Install requests:  
-`$pip install requests`  
-Install beautifulsoup4:  
-`$pip install beautifulsoup4`  
-Install spacy:  
-`$pip install -U spacy`  
-Download the languages models (in our example 3 of them: french, english and spanish):  
-`$python -m spacy download fr_core_news_sm`  
-`$python -m spacy download en_core_web_sm`  
-`$python -m spacy download es_core_news_sm`  
-Install textacy:  
-`$pip install textacy`  
-Install nltk:  
-`$pip install -U nltk`  
-Install networkx:  
-`$pip install networkx`  
-Install langid:  
-`$pip install langid`  
-
 ## How to use ?
 By default, the number of keywords, the URL and the log level must be given. You can configure an environment file at the root containing these values, such as:  
 `URL=https://my_url.com/`  
 `NB_KW=10`  
 `LOG_LEVEL=DEBUG`  
 Then build the docker image at the root directory (that we call "kw-extractor" here): `docker image build -t kw-extractor .`  
-Run your container by injecting the environment file (for example called ".kw_en""): `docker run --env-file=.kw_env kw_extractor`   
+Run your container by injecting the environment file (for example called ".kw_en""): `docker run --env-file=.kw_env kw-extractor`   
 
 Pay attention ! So far the solution is implemented only for web pages in English, French or Spanish.
 
