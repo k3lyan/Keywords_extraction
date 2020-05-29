@@ -28,7 +28,7 @@ By default, the number of keywords, the URL and the log level must be given. You
 `NB_KW=10`  
 `LOG_LEVEL=DEBUG`  
 Then build the docker image at the root directory (that we call "kw-extractor" here): `docker image build -t kw-extractor .`  
-Run your container by injecting the environment file (for example called ".kw_en""): `docker run --env-file=.kw_env kw-extractor`   
+Run your container by injecting the environment file (for example called ".kw_env"): `docker run --env-file=.kw_env kw-extractor`   
 
 Pay attention ! So far the solution is implemented only for web pages in English, French or Spanish.
 
